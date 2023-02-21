@@ -23,7 +23,6 @@ namespace Birthday_reminder
             #region WorkingWithExcel
 
             Application app = new Application();
-            //app.Visible = true;
 
             Workbook pivotTableWorkbook = app.Workbooks.Open(@"C:\Users\yokvachuk\Desktop\Files\Enternainwork\Arbeit\41. Birthday_reminder\Birthday_reminder\BirthdayFileUpd.xlsx");
             Worksheet ws = pivotTableWorkbook.Worksheets["Birthdays"];
