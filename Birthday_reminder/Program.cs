@@ -10,19 +10,8 @@ using Microsoft.Office.Interop.Excel;
 
 namespace Birthday_reminder
 {
-        //public static class Extensions
-        //{
-        //    public static void Append<K,V>(this Dictionary<K,V> first, Dictionary<K,V> second)
-        //    {
-        //        List<KeyValuePair<K, V>> pairs = second.ToList();
-        //        pairs.ForEach(pair => first.Add(pair.Key, pair.Value));
-        //    }
-            
-        //}
-
     public class Program
     {
-
         static void Main(string[] args)
         {
             #region WorkingWithExcel
@@ -88,18 +77,19 @@ namespace Birthday_reminder
             {
                 SortedBirthdayDictionary[item.Key] = item.Value;
             }
-
             #endregion
 
-            var DayofWeekNow = DateTime.Now.DayOfWeek;
+            #region TodayDataFetch
 
+            var DayofWeekNow = DateTime.Now.DayOfWeek;
             var NowCurrent = DateTime.Now;
             var NowMonth = NowCurrent.Month;
             var NowDay = NowCurrent.Day;
             DateTime NowCurrentNormalized = new DateTime(1, NowMonth, NowDay);
 
-            #region MatchingBirthdaysForWeek
+            #endregion
 
+            #region MatchingBirthdaysForWeek
 
             switch (DayofWeekNow)
             {
@@ -581,7 +571,6 @@ namespace Birthday_reminder
 
             #endregion
 
-
             #region ConsoleRepresentationForDay
 
             Console.WriteLine("This day there is the birthday of:");
@@ -602,9 +591,7 @@ namespace Birthday_reminder
             }
 
             #endregion
-
         }
-
             #region MethodsforArrayextract
         public static string[] GetCells(Worksheet ws, string startCell, string endCell)
         {
@@ -618,7 +605,6 @@ namespace Birthday_reminder
         #endregion
     }
 }
-// @"C:\Users\yokvachuk\Desktop\Files\Enternainwork\Arbeit\41. Birthday_reminder\Birthday_reminder\BirthdayFile.xlsx"
 
 // https://www.youtube.com/watch?v=_Hn4hbe1NxM
 // https://www.youtube.com/watch?v=93n2f80bK2k&t=38s
