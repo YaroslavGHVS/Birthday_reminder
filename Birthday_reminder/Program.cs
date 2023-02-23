@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Excel;
-//using System.Linq;
 
 namespace Birthday_reminder
 {
@@ -573,22 +572,68 @@ namespace Birthday_reminder
 
             #region ConsoleRepresentationForDay
 
-            Console.WriteLine("This day there is the birthday of:");
+            switch (DayBirthdaysDictionary.Count)
+            {
+                case 0:
+                    Console.WriteLine("No employee has birthday today:");
+                    break;
+                case 1:
+                    Console.WriteLine("This day there is the birthday of:");
+                    break;
+                case 2:
+                    Console.WriteLine("Today there are birthdas of:");
+                    break;
+                default:
+                    break;
+            }
+
             foreach (var item in DayBirthdaysDictionary)
             {
-                Console.WriteLine(item);
+                //Console.WriteLine(item);
+                var currentNowYear = DateTime.Now.Year;
+
+                var Month = item.Value.Month;
+                var Day = item.Value.Day;
+                DateTime UpdatedDate = new DateTime(currentNowYear,Month, Day);
+
+                var DayofWeek = item.Value.DayOfWeek;
+                Console.WriteLine("Name: {0}, On: {1}", item.Key, UpdatedDate.ToLongDateString());
             }
             Console.WriteLine("");
 
             #endregion
 
-            #region ConsoleREpresentationForWeek
+            #region ConsoleRepresentationForWeek
 
-            Console.WriteLine("This week there are the birthdays of:");
+            switch (WeekBirthdaysDictionary.Count)
+            {
+                case 0:
+                    Console.WriteLine("No employee has birthday this week:");
+                    break;
+                case 1:
+                    Console.WriteLine("This week there is the birthday of:");
+                    break;
+                case 2:
+                    Console.WriteLine("This week there are birthdas of:");
+                    break;
+                default:
+                    break;
+            }
+
             foreach (var item in WeekBirthdaysDictionary)
             {
-                Console.WriteLine(item);
+                Console.WriteLine("This week there are birthdays of:");
+                //Console.WriteLine(item);
+                var currentNowYear = DateTime.Now.Year;
+
+                var Month = item.Value.Month;
+                var Day = item.Value.Day;
+                DateTime UpdatedDate = new DateTime(currentNowYear, Month, Day);
+
+                var DayofWeek = item.Value.DayOfWeek;
+                Console.WriteLine("Name: {0}, On: {1}", item.Key, UpdatedDate.ToLongDateString());
             }
+
 
             #endregion
         }
