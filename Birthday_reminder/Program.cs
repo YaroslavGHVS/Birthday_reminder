@@ -20,11 +20,12 @@ namespace Birthday_reminder
 
             Application app = new Application();
 
-            Workbook pivotTableWorkbook = app.Workbooks.Open(@"C:\Users\yokvachuk\Desktop\Files\Enternainwork\Arbeit\41. Birthday_reminder\Birthday_reminder\BirthdayFile3.xlsx");
+            Workbook pivotTableWorkbook = app.Workbooks.Open(@"C:\Users\yokvachuk\Desktop\Files\Enternainwork\Arbeit\41. Birthday_reminder\Birthday_reminder\BirthdayFile4.xlsx");
             Worksheet ws = pivotTableWorkbook.Worksheets["Birthdays"];
 
+
             int totalColumns = ws.UsedRange.Columns.Count;
-            int totalRows = ws.UsedRange.Rows.Count;
+            int totalRows = ws.UsedRange.Rows.Count + 1;
             #endregion
 
             #region ArraysInitializing
@@ -53,6 +54,7 @@ namespace Birthday_reminder
 
             string[] namesList = GetCells(ws, "A1", "A"+totalRows);
 
+            app.Workbooks.Close();
             #endregion
 
             #region Instantiating,Populating,SortingDictionary
@@ -109,12 +111,12 @@ namespace Birthday_reminder
                     case DayOfWeek.Sunday:
                         return 6;
                     default:
-                        return 0;    
+                        throw new ArgumentException("We can't enter anythin");
                 }
             }
             Int32 n = DateOfWeekConversion(NowDayOfWeek);
-            IEnumerable<KeyValuePair<string, DateTime>> currenWeekBirthdaysDictionary = SortedBirthdayDictionary.Where(x => x.Value >= NowCurrentNormalized.AddDays(-n) && x.Value < NowCurrentNormalized.AddDays(6-n)); //!!!
-            //IEnumerable<KeyValuePair<string, DateTime>> currenWeekBirthdaysDictionary2 = SortedBirthdayDictionary.Where(x => x.Value >= NowCurrentNormalized.AddDays(-n) && x.Value < NowCurrentNormalized.AddDays(6-n)); //!!!
+
+            IEnumerable<KeyValuePair<string, DateTime>> currenWeekBirthdaysDictionary = SortedBirthdayDictionary.Where(x => x.Value >= NowCurrentNormalized.AddDays(-n) && x.Value < NowCurrentNormalized.AddDays(7-n)); //!!!
 
             foreach (KeyValuePair<string, DateTime> item in currenWeekBirthdaysDictionary)
             {
