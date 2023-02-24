@@ -4,8 +4,11 @@ using System.Data;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Excel;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Birthday_reminder
 {
@@ -17,7 +20,7 @@ namespace Birthday_reminder
 
             Application app = new Application();
 
-            Workbook pivotTableWorkbook = app.Workbooks.Open(@"C:\Users\yokvachuk\Desktop\Files\Enternainwork\Arbeit\41. Birthday_reminder\Birthday_reminder\BirthdayFile2.xlsx");
+            Workbook pivotTableWorkbook = app.Workbooks.Open(@"C:\Users\yokvachuk\Desktop\Files\Enternainwork\Arbeit\41. Birthday_reminder\Birthday_reminder\BirthdayFile3.xlsx");
             Worksheet ws = pivotTableWorkbook.Worksheets["Birthdays"];
 
             int totalColumns = ws.UsedRange.Columns.Count;
@@ -28,7 +31,6 @@ namespace Birthday_reminder
 
             DateTime[] birthdays = new DateTime[totalRows];
             DateTime[] BirthdaysYearReset = new DateTime[totalRows];
-            string[] namesList = new string[totalRows];
 
             #endregion
 
@@ -43,21 +45,17 @@ namespace Birthday_reminder
             for (int i = 0; i < birthdays.Length; i++)
             {
                 DateTime currdate = birthdays[i];
-                var month = currdate.Month;
-                var day = currdate.Day;
+                Int32 birthmonth = currdate.Month;
+                Int32 birthday = currdate.Day;
 
-                BirthdaysYearReset[i] = new DateTime(1, month, day);
+                BirthdaysYearReset[i] = new DateTime(1, birthmonth, birthday);
             }
 
-            string[] excelNames = GetCells(ws, "A1", "A"+totalRows);
-            for (int x = 0; x < excelNames.Length; x++)
-            {
-                namesList[x] = excelNames[x];
-            }
+            string[] namesList = GetCells(ws, "A1", "A"+totalRows);
 
             #endregion
 
-            #region PopulatingAndFillingDictionary
+            #region Instantiating,Populating,SortingDictionary
 
             Dictionary<string, DateTime> birthdaydictionary = new Dictionary<string, DateTime>();
             Dictionary<string, DateTime> SortedBirthdayDictionary = new Dictionary<string, DateTime>();
@@ -66,13 +64,13 @@ namespace Birthday_reminder
 
             for (int i = 0; i < totalRows - 1; i++) // there is less enumeration amounts than the number of rows by one
             {
-                birthdaydictionary.Add(namesList[i], BirthdaysYearReset[i]); //!!!
+                birthdaydictionary.Add(namesList[i], BirthdaysYearReset[i]);
             }
-            
-            var namesListSorted = birthdaydictionary.Values.ToList();
+
+            List<DateTime> namesListSorted = birthdaydictionary.Values.ToList();
             namesListSorted.Sort();
 
-            foreach (var item in birthdaydictionary.OrderBy(Value => Value.Value))
+            foreach (KeyValuePair<string, DateTime> item in birthdaydictionary.OrderBy(Value => Value.Value))
             {
                 SortedBirthdayDictionary[item.Key] = item.Value;
             }
@@ -80,492 +78,58 @@ namespace Birthday_reminder
 
             #region TodayDataFetch
 
-            var DayofWeekNow = DateTime.Now.DayOfWeek;
-            var NowCurrent = DateTime.Now;
-            var NowMonth = NowCurrent.Month;
-            var NowDay = NowCurrent.Day;
-            DateTime NowCurrentNormalized = new DateTime(1, NowMonth, NowDay);
+            DateTime NowCurrent = DateTime.Now;
+            Int32 month = NowCurrent.Month;
+            Int32 day = NowCurrent.Day;
+
+            DateTime NowCurrentNormalized = new DateTime(1, month, day);
 
             #endregion
 
-            #region MatchingBirthdaysForWeek
+            #region WeekBirthdaysExtraction
 
-            switch (DayofWeekNow)
+            DayOfWeek NowDayOfWeek = DateTime.Now.DayOfWeek;
+
+            int DateOfWeekConversion (DayOfWeek dow) // method to transfer values from week to number
             {
-                case DayOfWeek.Monday:
-                    
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized);
+                switch (dow)
+                {
+                    case DayOfWeek.Monday:
+                        return 0;       
+                    case DayOfWeek.Tuesday:
+                        return 1;
+                    case DayOfWeek.Wednesday:
+                        return 2;
+                    case DayOfWeek.Thursday:
+                        return 3;
+                    case DayOfWeek.Friday:
+                        return 4;
+                    case DayOfWeek.Saturday:
+                        return 5;
+                    case DayOfWeek.Sunday:
+                        return 6;
+                    default:
+                        return 0;    
+                }
+            }
+            Int32 n = DateOfWeekConversion(NowDayOfWeek);
+            IEnumerable<KeyValuePair<string, DateTime>> currenWeekBirthdaysDictionary = SortedBirthdayDictionary.Where(x => x.Value >= NowCurrentNormalized.AddDays(-n) && x.Value < NowCurrentNormalized.AddDays(6-n)); //!!!
+            //IEnumerable<KeyValuePair<string, DateTime>> currenWeekBirthdaysDictionary2 = SortedBirthdayDictionary.Where(x => x.Value >= NowCurrentNormalized.AddDays(-n) && x.Value < NowCurrentNormalized.AddDays(6-n)); //!!!
 
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                           WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(1)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(1));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(2)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(2));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(3)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(3));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(4)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(4));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(5)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(5));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(6)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(6));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    break;
-
-                case DayOfWeek.Tuesday:
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-1)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-1));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized);
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(1)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(1));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(2)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(2));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(3)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(3));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(4)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(4));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(5)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(5));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    break;
-                case DayOfWeek.Wednesday:
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-2)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-2));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-1)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-1));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized);
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(1)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(1));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(2)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(2));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(3)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(3));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(4)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(4));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    break;
-                case DayOfWeek.Thursday:
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-3)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-3));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-2)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-2));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-1)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-1));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized);
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(1)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(1));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(2)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(2));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(3)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(3));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    break;
-                case DayOfWeek.Friday:
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-4)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-4));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-3)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-3));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-2)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-2));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-1)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-1));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized);
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(1)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(1));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(2)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(2));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    break;
-                case DayOfWeek.Saturday:
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-5)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-5));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-4)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-4));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-3)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-3));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-2)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-2));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-1)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-1));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized);
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(1)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(1));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    break;
-                case DayOfWeek.Sunday:
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-6)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-6));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-5)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-5));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-4)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-4));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-3)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-3));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-2)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-2));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized.AddDays(-1)))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized.AddDays(-1));
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized))
-                    {
-                        var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized);
-
-                        foreach (KeyValuePair<string, DateTime> item in currentData)
-                        {
-                            WeekBirthdaysDictionary.Add(item.Key, item.Value);
-                        }
-                    }
-                    break;
-                default:
-                    Console.WriteLine("No birthdays this week.");
-                    break;
+            foreach (KeyValuePair<string, DateTime> item in currenWeekBirthdaysDictionary)
+            {
+                WeekBirthdaysDictionary.Add(item.Key, item.Value);
             }
 
             #endregion
 
-            #region MatchingBirthdayForDay
+            #region DayBirthdayExtraction
 
-            if (SortedBirthdayDictionary.ContainsValue(NowCurrentNormalized))
+            IEnumerable<KeyValuePair<string, DateTime>> currenDayBirthdaysDictionary = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized); //!!!
+
+            foreach (KeyValuePair<string, DateTime> item in currenDayBirthdaysDictionary)
             {
-                var currentData = SortedBirthdayDictionary.Where(x => x.Value == NowCurrentNormalized);
-
-                foreach (KeyValuePair<string, DateTime> item in currentData)
-                {
-                    DayBirthdaysDictionary.Add(item.Key, item.Value);
-                }
+                DayBirthdaysDictionary.Add(item.Key, item.Value);
             }
 
             #endregion
@@ -580,23 +144,21 @@ namespace Birthday_reminder
                 case 1:
                     Console.WriteLine("This day there is the birthday of:");
                     break;
-                case 2:
-                    Console.WriteLine("Today there are birthdas of:");
-                    break;
                 default:
+                    Console.WriteLine("Today there are birthdays of:");
                     break;
             }
 
-            foreach (var item in DayBirthdaysDictionary)
+            foreach (KeyValuePair<string, DateTime> item in DayBirthdaysDictionary)
             {
                 //Console.WriteLine(item);
-                var currentNowYear = DateTime.Now.Year;
+                int currentNowYear = DateTime.Now.Year;
 
-                var Month = item.Value.Month;
-                var Day = item.Value.Day;
+                int Month = item.Value.Month;
+                int Day = item.Value.Day;
                 DateTime UpdatedDate = new DateTime(currentNowYear,Month, Day);
 
-                var DayofWeek = item.Value.DayOfWeek;
+                DayOfWeek DayofWeek = item.Value.DayOfWeek;
                 Console.WriteLine("Name: {0}, On: {1}", item.Key, UpdatedDate.ToLongDateString());
             }
             Console.WriteLine("");
@@ -613,27 +175,22 @@ namespace Birthday_reminder
                 case 1:
                     Console.WriteLine("This week there is the birthday of:");
                     break;
-                case 2:
+                default:
                     Console.WriteLine("This week there are birthdas of:");
                     break;
-                default:
-                    break;
             }
 
-            foreach (var item in WeekBirthdaysDictionary)
+            foreach (KeyValuePair<string, DateTime> item in WeekBirthdaysDictionary)
             {
-                Console.WriteLine("This week there are birthdays of:");
-                //Console.WriteLine(item);
-                var currentNowYear = DateTime.Now.Year;
+                int currentNowYear = DateTime.Now.Year;
 
-                var Month = item.Value.Month;
-                var Day = item.Value.Day;
+                int Month = item.Value.Month;
+                int Day = item.Value.Day;
                 DateTime UpdatedDate = new DateTime(currentNowYear, Month, Day);
 
-                var DayofWeek = item.Value.DayOfWeek;
+                DayOfWeek DayofWeek = item.Value.DayOfWeek;
                 Console.WriteLine("Name: {0}, On: {1}", item.Key, UpdatedDate.ToLongDateString());
             }
-
 
             #endregion
         }
@@ -651,8 +208,11 @@ namespace Birthday_reminder
     }
 }
 
+// References to learning materials
+
 // https://www.youtube.com/watch?v=_Hn4hbe1NxM
 // https://www.youtube.com/watch?v=93n2f80bK2k&t=38s
-
 // https://stackoverflow.com/questions/25833425/read-all-rows-and-columns-using-microsoft-office-interop-excel
 // https://www.dotnetperls.com/sort-dictionary
+// https://www.tutorialsteacher.com/articles/convert-string-to-enum-in-cshar
+// https://www.tutorialsteacher.com/articles/convert-string-to-enum-in-csharp
