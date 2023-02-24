@@ -116,7 +116,7 @@ namespace Birthday_reminder
             }
             Int32 n = DateOfWeekConversion(NowDayOfWeek);
 
-            IEnumerable<KeyValuePair<string, DateTime>> currenWeekBirthdaysDictionary = SortedBirthdayDictionary.Where(x => x.Value >= NowCurrentNormalized.AddDays(-n) && x.Value < NowCurrentNormalized.AddDays(7-n)); //!!!
+            IEnumerable<KeyValuePair<string, DateTime>> currenWeekBirthdaysDictionary = SortedBirthdayDictionary.Where(x => x.Value >= NowCurrentNormalized.AddDays(-n) && x.Value <= NowCurrentNormalized.AddDays(6-n)); //!!!
 
             foreach (KeyValuePair<string, DateTime> item in currenWeekBirthdaysDictionary)
             {
@@ -161,7 +161,7 @@ namespace Birthday_reminder
                 DateTime UpdatedDate = new DateTime(currentNowYear,Month, Day);
 
                 DayOfWeek DayofWeek = item.Value.DayOfWeek;
-                Console.WriteLine("Name: {0}, On: {1}", item.Key, UpdatedDate.ToLongDateString());
+                Console.WriteLine("Name: {0}, On: {1}", item.Key, UpdatedDate.ToString("dd/MM"));
             }
             Console.WriteLine("");
 
@@ -191,7 +191,7 @@ namespace Birthday_reminder
                 DateTime UpdatedDate = new DateTime(currentNowYear, Month, Day);
 
                 DayOfWeek DayofWeek = item.Value.DayOfWeek;
-                Console.WriteLine("Name: {0}, On: {1}", item.Key, UpdatedDate.ToLongDateString());
+                Console.WriteLine("Name: {0}, On: {1}", item.Key, UpdatedDate.ToString("dd/MM"));
             }
 
             #endregion
