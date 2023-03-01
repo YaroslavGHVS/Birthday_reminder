@@ -52,9 +52,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BirthdaysList.cs" />
-    <Compile Include="EmailClient\EmailClient.cs" />
     <Compile Include="EmailClient\GmailClient.cs" />
+    <Compile Include="EmailClient\IEmailClient.cs" />
     <Compile Include="ExcelImporter.cs" />
+    <Compile Include="DayToIntConvert.cs" />
+    <Compile Include="Notification.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

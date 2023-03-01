@@ -7,7 +7,7 @@ using System.Linq;
 namespace Birthday_reminder
 {
     /// <summary>
-    /// Класс, который подготавливает все вводные для работы с таблицей дней рождений, представленной в excel. 
+    /// Класс, который подготавливает все вводные для работы с таблицей дней рождений, представленной в excel.
     /// Фильтрация не входит в функционал класса и выполняется за его пределами
     /// </summary>
     public class BirthdaysList
@@ -63,7 +63,15 @@ namespace Birthday_reminder
                 nameBithdateUnsorted.Add(names[i], dates[i]);
 
             foreach (KeyValuePair<string, DateTime> item in nameBithdateUnsorted.OrderBy(Value => Value.Value))
-                Dictionary[item.Key] = item.Value;
+
+                //if ()
+                //{
+
+                //}
+
+            // here to enter if element with break !!!!!
+
+            Dictionary[item.Key] = item.Value;
         }
 
         private List<string> getCellsRange(Worksheet ws, string startCell, string endCell)
