@@ -14,6 +14,9 @@ namespace Birthday_reminder
 
     public class Notification
     {
+        string weekGreeting = "----";
+        string dayGreeting = "----";
+
         public string getNotificationText(IEnumerable<KeyValuePair<string, DateTime>> birthdayList, NotificationFormat format)
         {
             string outputText = "";
