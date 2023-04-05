@@ -57,21 +57,8 @@ namespace Birthday_reminder
 
         private void fillNameDateDictionary()
         {
-            Dictionary<string, DateTime> nameBithdateUnsorted = new Dictionary<string, DateTime>();
-
             for (int i = 0; i < RowsAmount - 1; i++)
-                nameBithdateUnsorted.Add(names[i], dates[i]);
-
-            foreach (KeyValuePair<string, DateTime> item in nameBithdateUnsorted.OrderBy(Value => Value.Value))
-
-                //if ()
-                //{
-
-                //}
-
-            // here to enter if element with break !!!!!
-
-            Dictionary[item.Key] = item.Value;
+                Dictionary.Add(names[i], dates[i]);
         }
 
         private List<string> getCellsRange(Worksheet ws, string startCell, string endCell)
@@ -81,6 +68,5 @@ namespace Birthday_reminder
 
             return ((Array)ws.Range[startCell + ":" + endCell].Cells.Value).OfType<object>().Select(o => o.ToString()).ToList();
         }
-
     }
 }

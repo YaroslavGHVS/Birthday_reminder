@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BirthdaysList.cs" />
+    <Compile Include="Birthday_Definer.cs" />
     <Compile Include="EmailClient\GmailClient.cs" />
     <Compile Include="EmailClient\IEmailClient.cs" />
     <Compile Include="ExcelImporter.cs" />

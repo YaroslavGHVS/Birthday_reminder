@@ -9,23 +9,11 @@ namespace Birthday_reminder
     {
         static void Main(string[] args)
         {
-            BirthdaysList bdList = new BirthdaysList();
+            BirthdaysList bdList = new BirthdaysList(); // remains here
 
-            DateTime currentDateNormalized = new DateTime(1, DateTime.Now.Month, DateTime.Now.Day);
-
-            DayOfWeek currentDayOfWeek = DateTime.Now.DayOfWeek;
-            
-            Int32 currentDayNumber = new DayToIntConvert().getDayNumberFromUSAEnum(currentDayOfWeek); // weak reference
-
-            IEnumerable<KeyValuePair<string, DateTime>> currenWeekBirthdays = bdList.Dictionary.
-                Where(x => x.Value >= currentDateNormalized.AddDays(-currentDayNumber)
-                && x.Value <= currentDateNormalized.AddDays(6 - currentDayNumber));
-
-
-            IEnumerable<KeyValuePair<string, DateTime>> currenDayBirthdays = bdList.Dictionary.Where(x => x.Value == currentDateNormalized);
-
-            Console.WriteLine(new Notification().getNotificationText(currenDayBirthdays, NotificationFormat.Day));
-            Console.WriteLine(new Notification().getNotificationText(currenWeekBirthdays, NotificationFormat.Week));
+            Console.WriteLine(new Notification().getNotificationText(new Birthday_Definer(bdList).GetBirthdaysAtCurrentDay(), NotificationFormat.Day));
+            Console.WriteLine(new Notification().getNotificationText(new Birthday_Definer(bdList).GetBirthdaysAtCurrentWeek(), NotificationFormat.Week));
+            //Console.WriteLine(new Notification().getNotificationText(new Birthday_Def.getBirthdaysToday(), NotificationFormat.Week)); // remains here
             Console.ReadKey();
 
             /*EmailClient.GmailClient mailClient = new EmailClient.GmailClient("a@gmail.com", "", false);
