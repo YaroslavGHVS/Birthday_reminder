@@ -1,23 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using MailCLient;
+
 
 namespace Birthday_reminder
 {
     public class Program
     {
+
         static void Main(string[] args)
         {
+
             BirthdaysList bdList = new BirthdaysList(); // remains here
 
-            Console.WriteLine(new Notification().getNotificationText(new Birthday_Definer(bdList).GetBirthdaysAtCurrentDay(), NotificationFormat.Day));
-            Console.WriteLine(new Notification().getNotificationText(new Birthday_Definer(bdList).GetBirthdaysAtCurrentWeek(), NotificationFormat.Week));
-            //Console.WriteLine(new Notification().getNotificationText(new Birthday_Def.getBirthdaysToday(), NotificationFormat.Week)); // remains here
-            Console.ReadKey();
+            //Console.WriteLine(new Notification().getNotificationText(new Birthday_Definer(bdList).GetBirthdaysAtCurrentDay(), NotificationFormat.Day));
+            string weekBirthdays = new Notification().getNotificationText(new Birthday_Definer(bdList).GetBirthdaysAtCurrentWeek(), NotificationFormat.Week);
 
-            /*EmailClient.GmailClient mailClient = new EmailClient.GmailClient("a@gmail.com", "", false);
-            mailClient.SendMail("TESTTTT", "voinn.andrey@gmail.com");*/
+
+            List<string> receivers = new List<string>();
+            receivers.Add("yokvachuk@kpmg.ua");
+            receivers.Add("avoinalovych@kpmg.ua");
+
+            GmailClient gmail = new GmailClient();
+            gmail.Send(receivers, weekBirthdays);
+            
         }
     }
 }
@@ -30,3 +35,4 @@ namespace Birthday_reminder
 // https://www.dotnetperls.com/sort-dictionary
 // https://www.tutorialsteacher.com/articles/convert-string-to-enum-in-cshar
 // https://www.tutorialsteacher.com/articles/convert-string-to-enum-in-csharp
+

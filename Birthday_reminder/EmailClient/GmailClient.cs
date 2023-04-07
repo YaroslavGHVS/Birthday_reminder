@@ -1,46 +1,59 @@
-﻿using System;
-using System.Net;
-using System.Net.Mail;
+﻿using MailKit.Net.Smtp;
+using MimeKit;
+using System.Collections.Generic;
 
-namespace Birthday_reminder.EmailClient
+
+namespace MailCLient
 {
-/// <summary>
-/// Класс, который реализует процесс отправки письма пользователю. 
-/// </summary>
-    public class GmailClient : IEmailClient
+    class GmailClient
     {
-        public string FromMail = "voinn.andrey@gmail.com";
-        public string Subject = "Birthday Reminder";
+        private string senderName = "employees.birthdays.kpmg@gmail.com";
+        private string subject = "🎉Birthday Notification";
 
         private string smtpServer = "smtp.gmail.com";
-        private bool isSSLEnabled;
-        private NetworkCredential credential;
+        private int port = 587;
+        private bool useSsl = false;
 
-        public GmailClient(string usename, string pass, bool isSSLEnabled = true)
+        private string login = "employees.birthdays.kpmg@gmail.com";
+        private string pass = "aaeufjpwvrtdogwf";
+
+        private SmtpClient smtpInstance;
+
+        public GmailClient()
         {
-            credential = new NetworkCredential(usename, pass);
-            this.isSSLEnabled = isSSLEnabled;
+            smtpInstance = new SmtpClient();
+            smtpInstance.Connect(smtpServer, port, useSsl);
+            smtpInstance.Authenticate(login, pass);
         }
 
-        public bool SendMail(string text, string receipients)
+        ~GmailClient()
         {
-            try
+            smtpInstance.Disconnect(true);
+        }
+
+        public void Send(List<string> receivers, string htmlText)
+        {
+            smtpInstance.Send( generateMail(receivers, htmlText) );
+        }
+
+        private MimeMessage generateMail(List<string> receivers, string htmlText)
+        {
+            var email = new MimeMessage();
+
+            email.From.Add(new MailboxAddress("Sender Name", senderName));
+
+            foreach(string adress in receivers)
+                email.To.Add(new MailboxAddress("Receiver Name", adress));
+            
+            email.Subject = subject;
+            email.Body = new TextPart(MimeKit.Text.TextFormat.Html)
             {
-                var client = new SmtpClient(smtpServer, 587)
-                {
-                    Credentials = credential,
-                    EnableSsl = this.isSSLEnabled
-                };
-                client.Send(this.FromMail, receipients, this.Subject, text);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return false;
-            }
+                Text = htmlText
+            };
+
+            return email;
 
         }
     }
-
+    
 }

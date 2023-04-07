@@ -14,8 +14,8 @@ namespace Birthday_reminder
 
     public class Notification
     {
-        string weekNotification = "Greetings! \n \n 🎉Birthdays on this week are: ";
-        string dayNotification = "Greetings! \n \n 🎉Today's Birthdays are: ";
+        string weekNotification = "Greetings! <br> 🎉Birthdays on this week are: ";
+        string dayNotification = "Greetings! <br> 🎉Today's Birthdays are: ";
 
         public string getNotificationText(IEnumerable<KeyValuePair<string, DateTime>> birthdayList, NotificationFormat format)
         {
@@ -37,12 +37,12 @@ namespace Birthday_reminder
                         break;
                 }
 
-                outputText += "\n";
+                outputText += "<br>";
 
                 foreach (KeyValuePair<string, DateTime> item in birthdayList)
                 {
                     outputText += (string.Format("{0}", item.Key));
-                    outputText += "\n";
+                    outputText += "<br>";
                 }
             }
             else if (format == NotificationFormat.Week)
@@ -61,12 +61,12 @@ namespace Birthday_reminder
                         break;
                 }
 
-                outputText += "\n";
+                outputText += "<br>";
                 
                 foreach (KeyValuePair<string, DateTime> item in birthdayList)
                 {
                     outputText += (string.Format("{0} at {1}", item.Key, item.Value.ToString("dd.MM")));
-                    outputText += "\n";
+                    outputText += "<br>";
                 }
             }
 
