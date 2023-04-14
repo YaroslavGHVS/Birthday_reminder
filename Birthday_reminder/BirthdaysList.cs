@@ -12,22 +12,22 @@ namespace Birthday_reminder
     /// </summary>
     public class BirthdaysList
     {
-        public Dictionary<string, DateTime> Dictionary;
+        //public Dictionary<string, DateTime> Dictionary;
+        public List<Record> RecordList;
 
         public int ColumnsAmount { get; private set; }
         public int RowsAmount { get; private set; }
 
         private List<DateTime> dates;
         private List<string> names;
+        private List<string> emails;
 
         private Worksheet worksheet;
         private ExcelImporter importer;
 
         public BirthdaysList()
         {
-            Dictionary = new Dictionary<string, DateTime>();
-            dates = new List<DateTime>();
-            names = new List<string>();
+            RecordList = new List<Record>();
 
             importer = new ExcelImporter();
             worksheet = importer.GetFirstWorksheet();
@@ -35,6 +35,8 @@ namespace Birthday_reminder
             ColumnsAmount = worksheet.UsedRange.Columns.Count;
             RowsAmount = worksheet.UsedRange.Rows.Count + 1;
 
+            dates = new List<DateTime>();
+            
             fillObjectTable();
         }
         
@@ -43,6 +45,8 @@ namespace Birthday_reminder
         /// </summary>
         private void fillObjectTable()
         {
+            names = getCellsRange(worksheet, "A1", "A" + RowsAmount);
+
             List<string> excelBirthdays = getCellsRange(worksheet, "B1", "B" + RowsAmount);
             foreach (string birthday in excelBirthdays)
             {
@@ -50,7 +54,7 @@ namespace Birthday_reminder
                 dates.Add(new DateTime(1, date.Month, date.Day));
             }
 
-            names = getCellsRange(worksheet, "A1", "A" + RowsAmount);
+            emails = getCellsRange(worksheet, "C1", "C" +  RowsAmount);
 
             fillNameDateDictionary();
         }
@@ -58,7 +62,7 @@ namespace Birthday_reminder
         private void fillNameDateDictionary()
         {
             for (int i = 0; i < RowsAmount - 1; i++)
-                Dictionary.Add(names[i], dates[i]);
+                RecordList.Add(new Record(names[i], dates[i], emails[i]));
         }
 
         private List<string> getCellsRange(Worksheet ws, string startCell, string endCell)

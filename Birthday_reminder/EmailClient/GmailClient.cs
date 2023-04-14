@@ -1,6 +1,7 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit;
 using System.Collections.Generic;
+using Birthday_reminder;
 
 
 namespace MailCLient
@@ -31,19 +32,19 @@ namespace MailCLient
             smtpInstance.Disconnect(true);
         }
 
-        public void Send(List<string> receivers, string htmlText)
+        public void Send(List<Record> recordList, string htmlText)
         {
-            smtpInstance.Send( generateMail(receivers, htmlText) );
+            smtpInstance.Send(generateMail(recordList, htmlText) );
         }
 
-        private MimeMessage generateMail(List<string> receivers, string htmlText)
+        private MimeMessage generateMail(List<Record> recordList, string htmlText)
         {
             var email = new MimeMessage();
 
-            email.From.Add(new MailboxAddress("Sender Name", senderName));
+            email.From.Add(new MailboxAddress("Birthday Reminder KPMG", senderName));
 
-            foreach(string adress in receivers)
-                email.To.Add(new MailboxAddress("Receiver Name", adress));
+            foreach(Record record in recordList)
+                email.To.Add(new MailboxAddress(record.Name, record.Email));
             
             email.Subject = subject;
             email.Body = new TextPart(MimeKit.Text.TextFormat.Html)

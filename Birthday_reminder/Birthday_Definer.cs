@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Org.BouncyCastle.Asn1.Bsi;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,30 +7,37 @@ namespace Birthday_reminder
 {
     public class Birthday_Definer
     {
-        private IEnumerable<KeyValuePair<string, DateTime>> currentDayBirthdays;
-        private IEnumerable<KeyValuePair<string, DateTime>> currenWeekBirthdays;
+        public List<Record> DayBirthdays;
 
         private DateTime currentDateNormalized;
-
         private int currentDayNumber;
         private BirthdaysList bdList;
 
         public Birthday_Definer(BirthdaysList bdList)
         {
             currentDayNumber = new DayToIntConvert().getDayNumberFromUSAEnum(DateTime.Now.DayOfWeek); // weak reference
-            this.bdList = bdList;
-
             currentDateNormalized = new DateTime(1, DateTime.Now.Month, DateTime.Now.Day);
+            this.bdList = bdList;
         }
 
-        public IEnumerable<KeyValuePair<string, DateTime>> GetBirthdaysAtCurrentDay()
+        public List<Record> GetModifiedRecordList()
         {
-            return bdList.Dictionary.Where(x => x.Value == currentDateNormalized);
-        }
+            foreach (var record in bdList.RecordList)
+            {
+                if (record.BirthdayDate == currentDateNormalized)
+                {
+                    //DayBirthdays.Add(bd);
+                    record.IsTodayBirthday = true;
+                    record.IsUserNotified = false;
+                }
 
-        public IEnumerable<KeyValuePair<string, DateTime>> GetBirthdaysAtCurrentWeek()
-        {
-            return bdList.Dictionary.Where(x => x.Value >= currentDateNormalized.AddDays(-currentDayNumber) && x.Value <= currentDateNormalized.AddDays(6 - currentDayNumber));
+                if(record.BirthdayDate > currentDateNormalized && record.BirthdayDate <= currentDateNormalized.AddDays(7))
+                {
+                    record.IsWeekBirthday = true;
+                    record.IsUserNotified = false;
+                }
+            }
+            return bdList.RecordList;
         }
     }
 }

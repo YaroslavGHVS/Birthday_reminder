@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Security.Policy;
 using MailCLient;
 
 
@@ -6,23 +7,50 @@ namespace Birthday_reminder
 {
     public class Program
     {
-
         static void Main(string[] args)
         {
-
             BirthdaysList bdList = new BirthdaysList(); // remains here
+            Birthday_Definer bd_def = new Birthday_Definer(bdList);
+            List<Record> birthdayListModified = new List<Record>();
+            birthdayListModified = bd_def.GetModifiedRecordList(); // birthdayList marked
 
-            //Console.WriteLine(new Notification().getNotificationText(new Birthday_Definer(bdList).GetBirthdaysAtCurrentDay(), NotificationFormat.Day));
-            string weekBirthdays = new Notification().getNotificationText(new Birthday_Definer(bdList).GetBirthdaysAtCurrentWeek(), NotificationFormat.Week);
-
-
+            // для того чтобы составить список пользователей, кому нужно отправить письмо
             List<string> receivers = new List<string>();
-            receivers.Add("yokvachuk@kpmg.ua");
-            receivers.Add("avoinalovych@kpmg.ua");
+            foreach (Record record in birthdayListModified)
+            {
+                if (record.IsUserNotified)
+                {
+                    receivers.Add(record.Email);
+                }
+            }
 
-            GmailClient gmail = new GmailClient();
-            gmail.Send(receivers, weekBirthdays);
-            
+            // для того чтобы получить текстовки
+            string htmlDayNotifText = new Notification().getNotificationText(birthdayListModified, NotificationFormat.Day);
+            string htmlWeekNotifText = new Notification().getNotificationText(birthdayListModified, NotificationFormat.Week);
+
+            //send mail
+            GmailClient gmailClient = new GmailClient();
+
+            foreach (var item in birthdayListModified)
+            {
+                if (item.IsTodayBirthday == true)
+                {
+                    gmailClient.Send(birthdayListModified, htmlDayNotifText);
+                    break;
+                }
+            }
+
+            foreach (var item in birthdayListModified)
+            {
+                if (item.IsWeekBirthday == true)
+                {
+                    gmailClient.Send(birthdayListModified, htmlWeekNotifText);
+                    break;
+                }
+            }
+
+            //GmailClient gmail = new GmailClient();
+            //gmail.Send(receivers, weekBirthdays);
         }
     }
 }

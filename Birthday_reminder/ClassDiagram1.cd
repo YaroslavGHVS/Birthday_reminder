@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Birthday_reminder.Birthday_Definer" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAAAAEAQAAAAAAAAAAAAAAAAEACAAA=</HashCode>
+      <FileName>Birthday_Definer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Birthday_reminder.BirthdaysList" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAQAgAAAAAAgAAEAAABIAAAAAAAAAAIAggAAAIA=</HashCode>
+      <FileName>BirthdaysList.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Birthday_reminder.DayToIntConvert" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DayToIntConvert.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Birthday_reminder.ExcelImporter" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAQEgAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ExcelImporter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Birthday_reminder.Notification" Collapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Notification.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Birthday_reminder.Program">
+    <Position X="7" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Birthday_reminder.Record" Collapsed="true">
+    <Position X="7" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAACAAAAAIAAAAAAQACAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Record.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MailCLient.GmailClient" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAgAAAAAAEAEAAAACAAAAAAAgAgCEAAAAAEAA=</HashCode>
+      <FileName>EmailClient\GmailClient.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Birthday_reminder.NotificationFormat" Collapsed="true">
+    <Position X="0.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAA=</HashCode>
+      <FileName>Notification.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
